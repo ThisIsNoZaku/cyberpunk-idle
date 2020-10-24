@@ -1,38 +1,140 @@
+html, body {
+    height: 100%;
+    /*overflow: hidden;*/
+    background-color: #43464B;
+    color: white;
+}
+
 .App {
-  text-align: center;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.middle {
+    display: flex;
+    height: 100%;
+    flex-direction: row;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.container {
+    display: flex;
+    justify-content: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.gridItem {
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    align-self: center;
+    justify-content: center;
+    padding: 1px;
 }
 
-.App-link {
-  color: #61dafb;
+.sidebar {
+    min-width: 100px;
+    width: 50%;
+    --aug-border-bg: black;
+    --aug-border-all: 4px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sidebar.left {
+    padding-right: 20px;
+    --aug-r-extend1: 75%;
+}
+
+.sidebar.right {
+    padding-left: 20px;
+    --aug-l-extend1: 75%;
+}
+
+.summary {
+    --aug-border-all: 2px;
+    --aug-border-bg: black;
+}
+
+.summary > div {
+    padding: 5px 5px 15px 5px;
+}
+
+.summary:hover {
+    background-color: rgba(0, 255, 0, 0.5);
+    transition: background-color 0.25s;
+}
+
+.summary.job.inactive {
+    color: lightgray;
+    background-color: blue;
+    transition: background-color .25s, color .25s;
+}
+
+.summary.job.active {
+    color: white;
+    background-color: rgba(0, 255, 0, 0.5);
+    transition: background-color .25s, color .25s;
+}
+
+.summary.job.cooldown {
+    background-color: rgba(255, 0, 0, 0.75);
+    transition: background-color .25s, color .25s;
+}
+
+progress {
+    width: 100%;
+}
+
+.resource-bar {
+    min-height: 75px;
+    width: 100%;
+    --aug-border-bg: darkgreen;
+    display: flex;
+    flex-direction: row;
+    padding: 0px 10px 0px 10px;
+    justify-content: center;
+}
+
+.resource-display {
+    --aug-border-bg: darkgreen;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 125px;
+    padding: 5px;
+}
+
+.resource-value .resource-name {
+    flex-grow: 1;
+}
+
+.crew-name {
+    --aug-border-bg: black;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24pt;
+    width: 50%;
+}
+
+.crew-portrait {
+    --aug-all-height: 100px;
+    --aug-border-bg: blue;
+    background-color: black;
+}
+
+.skill-name {
+    --aug-border-bg: black;
+}
+
+.skill-value {
+    --aug-border-bg: black;
+}
+
+progress::-moz-progress-bar {
+    background: lawngreen;
+}
+
+progress::-webkit-progress-value {
+    background: lawngreen;
 }
