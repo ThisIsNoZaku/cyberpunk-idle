@@ -17,7 +17,7 @@ export default function CrewMemberSummary(props) {
                         {crewMember.name.get()}
                     </div>
                     <div className="crew-portrait" data-augmented-ui="all-hex-alt border">
-                        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"
+                        <img src={crewMember.portraitIcon.get()}
                              height={100}
                              draggable={true}
                              onDragStart={(e) => {

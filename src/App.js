@@ -12,7 +12,7 @@ import jobCanInitiate from "./jobCanInitiate";
 
 const crewMemberIds = [];
 
-function crewMember(id, name, skills) {
+function crewMember(id, name, skills, portraitIcon) {
     if (typeof id !== "number") {
         throw new Error("Id must be number");
     }
@@ -26,7 +26,8 @@ function crewMember(id, name, skills) {
             skills: {
                 startingValue: skills
             },
-            assignedJob: null
+            assignedJob: null,
+            portraitIcon
         }
     }
 }
@@ -91,7 +92,10 @@ function job(id, name, skills, minCrew, maxCrew, consumedResources, onCompletion
 
 const config = new EngineConfiguration()
     .WithGlobalProperties({
-        crew: [crewMember(1, "Steve", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1})],
+        crew: [
+            crewMember(1, "Steve", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1}, "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"),
+            crewMember(2, "Bub", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1}, "https://pbs.twimg.com/media/ELckiVoXsAAMAe0?format=jpg&name=4096x4096" )
+        ],
         jobs: [
             job("shoplifting", "Shoplifting", {stealth: 1}, 1, 1, {}, {
                 trivialGoods: 1
