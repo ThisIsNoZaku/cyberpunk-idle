@@ -165,9 +165,8 @@ function App(props) {
                         Your Sick AF Crew
                     </div>
                     {engine.globals["crew"].get().map(crewContainer => {
-                        const crew = crewContainer.get();
                         return <div data-augmented-ui-reset>
-                            <CrewMemberSummary crewMember={crew}/>
+                            <CrewMemberSummary engine={engine} crewMember={crewContainer}/>
                         </div>
                     })}
                 </Sidebar>

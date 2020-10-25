@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import canAssignToJob from "../canAssignToJob";
 
 export default function JobSummary(props) {
-    const className = ["job", "summary", props.status].join(" ");
+    const className = ["job", "summary", props.status, "right"].join(" ");
     return <div className={className}
                 onDragEnter={e => e.preventDefault()}
                 onDragOver={e => e.preventDefault()}

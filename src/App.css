@@ -64,21 +64,28 @@ html, body {
     transition: background-color 0.25s;
 }
 
-.summary.job.inactive {
-    background-color: gray;
+.summary.inactive {
+    background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(130,130,130,1) 50%, rgba(255,255,255,0) 100%);
+}
+
+.summary.active.left {
+    animation-name: shimmer-right;
+}
+
+.summary.active.right {
+    animation-name: shimmer-left;
 }
 
 .summary.active {
     color: white;
-    background: linear-gradient(to left, rgb(0, 175, 0) 30%, rgb(150, 225,150) 80%, rgb(0, 175, 0) 100%) repeat;
+    background: linear-gradient(to left, rgb(0, 175, 0) 10%, rgb(150, 225,150) 80%, rgb(0, 175, 0) 100%) repeat;
     background-size: 50%;
-    animation-name: shimmer;
     animation-duration: 2s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
 
-@keyframes shimmer {
+@keyframes shimmer-left {
     0% {
         background-position: right bottom;;
     }
@@ -87,9 +94,35 @@ html, body {
     }
 }
 
-.summary.job.cooldown {
-    background-color: rgba(255, 0, 0, 0.75);
-    transition: background-color .25s, color .25s;
+@keyframes pulse {
+    0% {
+        background-color: var(--dampened-color);
+    }
+    50% {
+        background-color: var(--base-color);
+    }
+    100% {
+        background-color: var(--dampened-color);
+    }
+}
+
+@keyframes shimmer-right {
+    0% {
+        background-position: left bottom;;
+    }
+    100% {
+        background-position: right bottom;
+    }
+}
+
+.summary.cooldown {
+    --base-color: rgba(255, 0, 0, .75);
+    --dampened-color: rgba(255, 0, 0, .25);
+    background-color: var(--base-color);
+    animation-duration: 2s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-name: pulse;
 }
 
 progress {
