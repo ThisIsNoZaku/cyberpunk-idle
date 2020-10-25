@@ -52,6 +52,7 @@ html, body {
 .summary {
     --aug-border-all: 2px;
     --aug-border-bg: black;
+    transition: background-color .25s, color .25s;
 }
 
 .summary > div {
@@ -64,15 +65,26 @@ html, body {
 }
 
 .summary.job.inactive {
-    color: lightgray;
-    background-color: blue;
-    transition: background-color .25s, color .25s;
+    background-color: gray;
 }
 
-.summary.job.active {
+.summary.active {
     color: white;
-    background-color: rgba(0, 255, 0, 0.5);
-    transition: background-color .25s, color .25s;
+    background: linear-gradient(to left, rgb(0, 175, 0) 30%, rgb(150, 225,150) 80%, rgb(0, 175, 0) 100%) repeat;
+    background-size: 50%;
+    animation-name: shimmer;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: right bottom;;
+    }
+    100% {
+        background-position: left bottom;
+    }
 }
 
 .summary.job.cooldown {

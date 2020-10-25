@@ -16,7 +16,7 @@ export default function JobSummary(props) {
                             props.assignedCrew.splice(props.assignedCrew.indexOf(crewMember.id));
                             subscribed.unsubscribe();
                         });
-                        props.assignedCrew.push(crewMember.id);
+                        props.job.assignedCrew.push(crewMember.id);
                     }
                     e.preventDefault();
                 }}

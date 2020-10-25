@@ -19,17 +19,15 @@ function crewMember(id, name, skills, portraitIcon) {
     if (crewMemberIds.includes(id)) {
         throw new Error("Crew member Id " + id + " already used");
     }
-    return {
-        startingValue: {
+    return EngineConfiguration.configProperty(
+        {
             id,
             name,
-            skills: {
-                startingValue: skills
-            },
+            skills: EngineConfiguration.configProperty(skills),
             assignedJob: null,
-            portraitIcon
-        }
-    }
+            portraitIcon,
+            accumulatedHeat: 0
+        })
 }
 
 function job(id, name, skills, minCrew, maxCrew, consumedResources, onCompletionResources, timeToComplete, cooldownTime) {
@@ -46,10 +44,10 @@ function job(id, name, skills, minCrew, maxCrew, consumedResources, onCompletion
         assignedCrew: [],
         status: EngineConfiguration.configProperty("", (current, parent, engine) => {
             const resources = engine.globals["resources"].get();
-            const progress = parent.get().progress.get();
-            const timeToComplete = parent.get().timeToComplete.get();
+            const progress = parent.progress.get();
+            const timeToComplete = parent.timeToComplete.get();
             if ((current == "cooldown" && progress > 0) ||
-                current == "active" && !jobCanProceed(parent.get()) ||
+                current == "active" && !jobCanProceed(parent) ||
                 progress >= timeToComplete) {
                 return "cooldown";
             }
@@ -96,16 +94,16 @@ const config = new EngineConfiguration()
             crewMember(1, "Steve", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1}, "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"),
             crewMember(2, "Bub", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1}, "https://pbs.twimg.com/media/ELckiVoXsAAMAe0?format=jpg&name=4096x4096" )
         ],
-        jobs: [
-            job("shoplifting", "Shoplifting", {stealth: 1}, 1, 1, {}, {
+        jobs: {
+            shoplifting: job("shoplifting", "Shoplifting", {stealth: 1}, 1, 1, {}, {
                 trivialGoods: 1
             }, 20, 10),
-            job("fencing", "Fence Goods", {social: 1}, 1, 1, {
+            fencing: job("fencing", "Fence Goods", {social: 1}, 1, 1, {
                 trivialGoods: 1
             }, {
                 nuyen: 1
             }, 10, 1)
-        ],
+        },
         resources: EngineConfiguration.configProperty({
             nuyen: {
                 name: "¥",
@@ -120,25 +118,29 @@ const config = new EngineConfiguration()
 const engine = new Engine(config);
 engine.start();
 
+function jobTranslator(job) {
+    return {
+        id: job.id.get(),
+        timeToComplete: job.timeToComplete.get(),
+        requiredSkills: job.requiredSkills.get(),
+        name: job.name.get(),
+        assignedCrew: job.assignedCrew.get(),
+        progress: job.progress.get(),
+        status: job.status.get(),
+        maxCrew: job.maxCrew.get()
+    }
+}
+
 function App(props) {
     const [expanded, setExpanded] = useState(false);
     const [dragging, setDragging] = useState(false);
-    const [jobs, setJobs] = useState({});
+    const [jobs, setJobs] = useState(engine.globals.jobs.get());
     const [resources, setResources] = useState(engine.globals.resources.get());
     useEffect(() => {
         const subscription = engine.globals["jobs"].on("changed", function (newJobs) {
-            const jobs = newJobs.reduce((jobs, job) => {
-                const jobId = job.get().id.get();
-                jobs[jobId] = {
-                    id: job.get().id.get(),
-                    timeToComplete: job.get().timeToComplete.get(),
-                    requiredSkills: job.get().requiredSkills.get(),
-                    name: job.get().name.get(),
-                    assignedCrew: job.get().assignedCrew.get(),
-                    progress: job.get().progress.get(),
-                    status: job.get().status.get(),
-                    maxCrew: job.get().maxCrew.get()
-                };
+            const jobs = Object.keys(newJobs).reduce((jobs, job) => {
+                const jobId = newJobs[job].id.get();
+                jobs[jobId] = jobTranslator(newJobs[jobId]);
                 return jobs;
             }, {});
             setJobs(jobs);
