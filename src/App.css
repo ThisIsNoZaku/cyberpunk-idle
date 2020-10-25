@@ -80,7 +80,7 @@ html, body {
     color: white;
     background: linear-gradient(to left, rgb(0, 175, 0) 10%, rgb(150, 225,150) 80%, rgb(0, 175, 0) 100%) repeat;
     background-size: 50%;
-    animation-duration: 2s;
+    animation-duration: 1s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
@@ -119,7 +119,7 @@ html, body {
     --base-color: rgba(255, 0, 0, .75);
     --dampened-color: rgba(255, 0, 0, .25);
     background-color: var(--base-color);
-    animation-duration: 2s;
+    animation-duration: 1s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     animation-name: pulse;
