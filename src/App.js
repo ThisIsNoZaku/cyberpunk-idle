@@ -91,18 +91,21 @@ function job(id, name, skills, minCrew, maxCrew, consumedResources, onCompletion
 const config = new EngineConfiguration()
     .WithGlobalProperties({
         crew: [
-            crewMember(1, "Steve", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1}, "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"),
-            crewMember(2, "Bub", {combat: 1, stealth: 1, tech: 1, social: 1, magic: 1}, "https://pbs.twimg.com/media/ELckiVoXsAAMAe0?format=jpg&name=4096x4096" )
+            crewMember(1, "Steve", {combat: 1, stealth: 0, tech: 0, social: 0, magic: 0}, "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"),
+            crewMember(2, "Bub", {combat: 0, stealth: 1, tech: 0, social: 0, magic: 0}, "https://pbs.twimg.com/media/ELckiVoXsAAMAe0?format=jpg&name=4096x4096")
         ],
         jobs: {
             shoplifting: job("shoplifting", "Shoplifting", {stealth: 1}, 1, 1, {}, {
                 trivialGoods: 1
             }, 20, 10),
-            fencing: job("fencing", "Fence Goods", {social: 1}, 1, 1, {
+            fencing: job("fencing", "Fence Goods", {}, 1, 1, {
                 trivialGoods: 1
             }, {
                 nuyen: 1
-            }, 10, 1)
+            }, 10, 1),
+            mugging: job("mugging", "Mugging", {combat:1}, 1, 999, {}, {
+                nuyen:1
+            }, 5, 30)
         },
         resources: EngineConfiguration.configProperty({
             nuyen: {
@@ -161,7 +164,7 @@ function App(props) {
                          expand={() => setExpanded(true)}
                          click={() => setDragging(true)}
                          collapse={() => setExpanded(false)}>
-                    <div className="container">
+                    <div className="header">
                         Your Sick AF Crew
                     </div>
                     {engine.globals["crew"].get().map(crewContainer => {

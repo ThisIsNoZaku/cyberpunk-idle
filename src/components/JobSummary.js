@@ -1,6 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import canAssignToJob from "../canAssignToJob";
+import SkillTable from "./SkillTable";
 
 export default function JobSummary(props) {
     const className = ["job", "summary", props.status, "right"].join(" ");
@@ -31,5 +32,6 @@ export default function JobSummary(props) {
             </div>
         </div>
         <progress max={props.timeToComplete} value={props.progress}></progress>
+        <SkillTable skills={props.job.requiredSkills}/>
     </div>
 }

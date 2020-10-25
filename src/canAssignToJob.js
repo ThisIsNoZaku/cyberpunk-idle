@@ -10,6 +10,6 @@ function sufficientSkill(crewMemberSkill, jobSkillRequirement) {
     }
     return Object.keys(jobSkillRequirement).reduce((allowed, nextSkill) => {
         const jobSkill = jobSkillRequirement[nextSkill].get();
-        return allowed && (crewMemberSkill[nextSkill] >= jobSkill);
+        return allowed && (jobSkill === undefined || crewMemberSkill[nextSkill] >= jobSkill);
     }, true);
 }
