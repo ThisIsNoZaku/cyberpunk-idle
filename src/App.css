@@ -17,6 +17,8 @@ html, body {
     display: flex;
     justify-content: center;
     font-size:  36px;
+    padding-top: 5px;
+    padding-bottom: 10px;
 }
 
 .App {
@@ -67,7 +69,6 @@ html, body {
 .summary {
     --aug-border-all: 2px;
     --aug-border-bg: black;
-    transition: background-color .25s, color .25s;
 }
 
 .summary > div {
@@ -80,57 +81,42 @@ html, body {
 }
 
 .summary.inactive {
-    background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(130,130,130,1) 50%, rgba(255,255,255,0) 100%);
-}
-
-.summary.active.left {
-    animation-name: shimmer-right;
-}
-
-.summary.active.right {
-    animation-name: shimmer-left;
+    background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.25) 50%, rgba(255,255,255,0) 100%);
+    /*background-color: gray;*/
 }
 
 .summary.active {
     color: white;
-    background: linear-gradient(to left, rgb(0, 175, 0) 10%, rgb(150, 225,150) 80%, rgb(0, 175, 0) 100%) repeat;
-    background-size: 50%;
+    --base-color: rgba(0, 255, 0, .75);
+    --dampened-color: rgba(0, 255, 0, .25);
+    animation-name: pulse;
     animation-duration: 1s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
 
-@keyframes shimmer-left {
-    0% {
-        background-position: right bottom;;
-    }
-    100% {
-        background-position: left bottom;
-    }
-}
-
-@keyframes pulse {
-    0% {
-        background-color: var(--dampened-color);
-    }
-    50% {
-        background-color: var(--base-color);
-    }
-    100% {
-        background-color: var(--dampened-color);
-    }
-}
-
-@keyframes shimmer-right {
-    0% {
-        background-position: left bottom;;
-    }
-    100% {
-        background-position: right bottom;
-    }
+.summary.available {
+    color: #ffd700;
+    --base-color: rgba(255, 215, 0, .75);
+    --dampened-color: rgba(255, 215, 0, .25);
+    background-color: var(--base-color);
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-name: pulse;
 }
 
 .summary.cooldown {
+    --base-color: rgba(255, 0, 0, .75);
+    --dampened-color: rgba(255, 0, 0, .25);
+    background-color: var(--base-color);
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-name: pulse;
+}
+
+.summary.blocked {
     --base-color: rgba(255, 0, 0, .75);
     --dampened-color: rgba(255, 0, 0, .25);
     background-color: var(--base-color);
@@ -213,4 +199,15 @@ progress::-webkit-progress-value {
 }
 .tech-skill {
     color: orange;
+}
+@keyframes pulse {
+    0% {
+        background-color: var(--dampened-color);
+    }
+    50% {
+        background-color: var(--base-color);
+    }
+    100% {
+        background-color: var(--dampened-color);
+    }
 }
