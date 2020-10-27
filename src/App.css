@@ -87,9 +87,10 @@ html, body {
 
 .summary.active {
     color: white;
+    background-color: var(--base-color);
     --base-color: rgba(0, 255, 0, .75);
     --dampened-color: rgba(0, 255, 0, .25);
-    animation-name: pulse;
+    /*animation-name: pulse;*/
     animation-duration: 1s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
@@ -103,7 +104,7 @@ html, body {
     animation-duration: 1s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
-    animation-name: pulse;
+    /*animation-name: pulse;*/
 }
 
 .summary.cooldown {
@@ -113,7 +114,7 @@ html, body {
     animation-duration: 1s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
-    animation-name: pulse;
+    /*animation-name: pulse;*/
 }
 
 .summary.blocked {
@@ -123,7 +124,7 @@ html, body {
     animation-duration: 1s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
-    animation-name: pulse;
+    /*animation-name: pulse;*/
 }
 
 progress {

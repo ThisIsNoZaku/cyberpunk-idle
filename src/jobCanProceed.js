@@ -1,6 +1,6 @@
 export default function (job) {
-    const assignedPersonnel = job.assignedCrew.get();
-    const minRequired = job.minCrew.get();
+    const assignedPersonnel = job.assignedCrew;
+    const minRequired = job.minCrew;
     return assignedPersonnel.length >= minRequired;
 
 }

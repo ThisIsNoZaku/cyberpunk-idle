@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 import './App.css';
 import {Engine, EngineConfiguration} from "javascript-idle-engine";
 import Sidebar from "./components/Sidebar";
-import Jobs from "./components/Jobs";
 import {useState} from "react";
 import CrewMemberSummary from "./components/CrewMemberSummary";
 import JobSummary from "./components/JobSummary";
@@ -43,40 +42,46 @@ function job(id, name, skills, minCrew, maxCrew, consumedResources, onCompletion
         cooldownTime: cooldownTime || timeToComplete,
         assignedCrew: [],
         status: EngineConfiguration.configProperty("", (current, parent, engine) => {
-            const resources = engine.globals["resources"].get();
-            const progress = parent.progress.get();
-            const timeToComplete = parent.timeToComplete.get();
+            const resources = engine.globals["resources"];
+            const progress = parent.progress;
+            const timeToComplete = parent.timeToComplete;
+            const crewAssigned = parent.assignedCrew;
             if ((current == "cooldown" && progress > 0) ||
                 current == "active" && !jobCanProceed(parent) ||
                 progress >= timeToComplete) {
                 return "cooldown";
             }
-            if(progress == 0 && jobCanInitiate(parent.get(), resources)) {
-                for(const resource in parent.get().consumedResources.get()) {
-                    const currentQuantity = resources[resource].get().quantity.get();
-                    const amountToConsume = parent.get().consumedResources.get()[resource].get();
-                    resources[resource].get().quantity.set(currentQuantity - amountToConsume);
+            if(progress == 0) {
+                if( jobCanInitiate(parent, resources)) {
+                    for (const resource in parent.consumedResources) {
+                        const currentQuantity = resources[resource].quantity;
+                        const amountToConsume = parent.consumedResources[resource];
+                        resources[resource].quantity =(currentQuantity - amountToConsume);
+                    }
+                    return "active";
+                } else if(crewAssigned.length) {
+                    return "blocked";
                 }
-                return "active";
             }
-            if(current == "active" && jobCanProceed(parent.get())) {
+            if(current == "active" && jobCanProceed(parent)) {
                 return "active";
             }
             return "inactive";
         }),
         progress: EngineConfiguration.configProperty(0, (current, parent, engine) => {
-            switch (parent.get().status.get()) {
+            console.log(current);
+            switch (parent.status) {
                 case "cooldown":
-                    const cooldownTime = parent.get().cooldownTime.get();
-                    const timeToComplete = parent.get().timeToComplete.get();
+                    const cooldownTime = parent.cooldownTime;
+                    const timeToComplete = parent.timeToComplete;
                     return current - (timeToComplete / cooldownTime);
                 case "active":
-                    if (current + 1 >= parent.get().timeToComplete.get()) {
-                        const resources = parent.get().onCompletionResources.get();
+                    if (current + 1 >= parent.timeToComplete) {
+                        const resources = parent.onCompletionResources;
                         Object.keys(resources)
                             .forEach(resourceName => {
-                                const resource = engine.globals["resources"].get()[resourceName].get();
-                                resource.quantity.set(resources[resourceName].get() + resource.quantity.get());
+                                const resource = engine.globals["resources"][resourceName];
+                                resource.quantity = resources[resourceName] + resource.quantity;
                             });
                     }
                     return current + 1;
@@ -90,10 +95,10 @@ function job(id, name, skills, minCrew, maxCrew, consumedResources, onCompletion
 
 const config = new EngineConfiguration()
     .WithGlobalProperties({
-        crew: [
-            crewMember(1, "Steve", {combat: 1, stealth: 0, tech: 0, social: 0, magic: 0}, "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"),
-            crewMember(2, "Bub", {combat: 0, stealth: 1, tech: 0, social: 0, magic: 0}, "https://pbs.twimg.com/media/ELckiVoXsAAMAe0?format=jpg&name=4096x4096")
-        ],
+        crew: {
+            1: crewMember(1, "Steve", {combat: 1, stealth: 0, tech: 0, social: 0, magic: 0}, "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/922a0c75746643.5c551ca8dca2c.jpg"),
+            2: crewMember(2, "Bub", {combat: 0, stealth: 1, tech: 0, social: 0, magic: 0}, "https://pbs.twimg.com/media/ELckiVoXsAAMAe0?format=jpg&name=4096x4096")
+        },
         jobs: {
             shoplifting: job("shoplifting", "Shoplifting", {stealth: 1}, 1, 1, {}, {
                 trivialGoods: 1
@@ -117,72 +122,76 @@ const config = new EngineConfiguration()
                 quantity: 0
             }
         })
-    })
+    });
 const engine = new Engine(config);
 engine.start();
 
 function jobTranslator(job) {
     return {
-        id: job.id.get(),
-        timeToComplete: job.timeToComplete.get(),
-        requiredSkills: job.requiredSkills.get(),
-        name: job.name.get(),
-        assignedCrew: job.assignedCrew.get(),
-        progress: job.progress.get(),
-        status: job.status.get(),
-        maxCrew: job.maxCrew.get()
+        id: job.id,
+        timeToComplete: job.timeToComplete,
+        requiredSkills: job.requiredSkills,
+        name: job.name,
+        assignedCrew: job.assignedCrew,
+        progress: job.progress,
+        status: job.status,
+        maxCrew: job.maxCrew
     }
 }
 
 function App(props) {
     const [expanded, setExpanded] = useState(false);
-    const [dragging, setDragging] = useState(false);
-    const [jobs, setJobs] = useState(engine.globals.jobs.get());
-    const [resources, setResources] = useState(engine.globals.resources.get());
+    const [jobs, setJobs] = useState(engine.globals.jobs);
+    const [crew, setCrew] = useState(engine.globals.crew);
+    const [resources, setResources] = useState(engine.globals.resources);
+    const [beingDragged, setBeingDragged] = useState();
     useEffect(() => {
-        const subscription = engine.globals["jobs"].on("changed", function (newJobs) {
-            const jobs = Object.keys(newJobs).reduce((jobs, job) => {
-                const jobId = newJobs[job].id.get();
-                jobs[jobId] = jobTranslator(newJobs[jobId]);
-                return jobs;
-            }, {});
-            setJobs(jobs);
+        const subscription = engine.globals["jobs"].watch(function (changedProperty, newJobs) {
+            setJobs({...newJobs});
         });
         return () => subscription.unsubscribe();
-    }, [jobs]);
-    useEffect(() => {
-        const sub = engine.globals["resources"].on("changed", resources => {
-            setResources(resources);
-        });
-        return () => sub.unsubscribe();
-    }, [resources]);
+    }, [setJobs]);
+    // useEffect(() => {
+    //     const subscription = engine.globals["crew"].on("changed", function (newCrew) {
+    //         setCrew(newCrew);
+    //     });
+    // });
+    // useEffect(() => {
+    //     const sub = engine.globals["resources"].on("changed", resources => {
+    //         setResources(resources);
+    //     });
+    //     return () => sub.unsubscribe();
+    // }, [resources]);
     return (
-        <div className="App" onMouseUp={() => setDragging(false)}>
+        <div className="App" onMouseUp={() => {
+            setBeingDragged(false)
+        }} onDragEnd={() => {
+            setBeingDragged(false)
+        }}>
             <ResourceBar resources={resources}></ResourceBar>
             <div className="middle">
-                <Sidebar side="left" expanded={expanded || dragging}
+                <Sidebar side="left" expanded={expanded || beingDragged}
                          expand={() => setExpanded(true)}
-                         click={() => setDragging(true)}
                          collapse={() => setExpanded(false)}>
                     <div className="header">
                         Your Sick AF Crew
                     </div>
-                    {engine.globals["crew"].get().map(crewContainer => {
+                    {Object.keys(crew).map(id => {
                         return <div data-augmented-ui-reset>
-                            <CrewMemberSummary engine={engine} crewMember={crewContainer}/>
+                            <CrewMemberSummary engine={engine} crewMember={engine.globals.crew[id]} setBeingDragged={(cm)=>{
+                               setBeingDragged(cm);
+                            }}/>
                         </div>
                     })}
                 </Sidebar>
-                <Sidebar side="right" expanded={expanded || dragging}
+                <Sidebar side="right" expanded={expanded || beingDragged}
                          expand={() => setExpanded(true)}
-                         click={() => setDragging(true)}
                          collapse={() => setExpanded(false)}>
-                    <div className="container">
+                    <div className="header">
                         Totally Rad Jobs
                     </div>
                     {Object.keys(jobs).map(jobId => {
-                        const jobData = jobs[jobId];
-                        return <JobSummary engine={engine} job={engine.globals.jobs[jobId]} {...jobData} />
+                        return <JobSummary beingDragged={beingDragged} engine={engine} job={jobs[jobId]} />
                     })}
                 </Sidebar>
             </div>
